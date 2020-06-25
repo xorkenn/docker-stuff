@@ -1,0 +1,59 @@
+version: "3.8"
+services:
+  influxdb:
+    container_name: "influxdb"
+    image: "influxdb:latest"
+    ports:
+      - 8086:8086
+    volumes:
+      - /opt/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+      - influxdb-storage:/var/lib/influxdb
+    restart: unless-stopped
+    networks:
+      - influxdb-net
+  telegraf:
+    container_name: "telegraf"
+    image: "telegraf:latest"
+    depends_on:
+      - influxdb
+    environment:
+      HOST_ETC: /hostfs/etc
+      HOST_PROC: /hostfs/proc
+      HOST_SYS: /hostfs/sys
+      HOST_VAR: /hostfs/var
+      HOST_RUN: /hostfs/run
+      HOST_MOUNT_PREFIX: /hostfs
+    volumes:
+      - /opt/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/hostfs:ro
+      - /etc:/hostfs/etc:ro
+      - /proc:/hostfs/proc:ro
+      - /sys:/hostfs/sys:ro
+      - /var:/hostfs/var:ro
+      - /run:/hostfs/run:ro
+    restart: unless-stopped
+    networks:
+      - influxdb-net
+  grafana:
+    container_name: "grafana"
+    image: "grafana/grafana:latest"
+    ports:
+      - 3000:3000
+    depends_on:
+      - influxdb
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    restart: unless-stopped
+    networks:
+      - influxdb-net
+
+networks:
+  influxdb-net:
+    name: "influxdb-net"
+
+volumes:
+  grafana-storage:
+    name: "grafana-storage"
+  influxdb-storage:
+    name: "influxdb-storage"
