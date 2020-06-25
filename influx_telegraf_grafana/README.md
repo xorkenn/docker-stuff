@@ -7,7 +7,7 @@ Configure Telegraf
 ```
 docker run --rm telegraf telegraf config > /opt/telegraf.conf
 Modify telegraf.conf:
-  urls = ["http://influxdb:8086"]
+  urls = ["http://127.0.0.1:8086"]
 ```
 
 Run `docker-compose up -d`
