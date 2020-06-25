@@ -33,8 +33,7 @@ services:
       - /var:/hostfs/var:ro
       - /run:/hostfs/run:ro
     restart: unless-stopped
-    networks:
-      - influxdb-net
+    network_mode: host
   grafana:
     container_name: "grafana"
     image: "grafana/grafana:latest"
